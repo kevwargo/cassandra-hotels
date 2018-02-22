@@ -39,7 +39,7 @@ public class BackendSession {
 
 		Cluster cluster = Cluster.builder()
             .addContactPoint(contactPoint)
-            .withQueryOptions(new QueryOptions().setConsistencyLevel(ConsistencyLevel.ONE))
+            .withQueryOptions(new QueryOptions().setConsistencyLevel(ConsistencyLevel.QUORUM))
             .build();
 		try {
 			session = cluster.connect(keyspace);
@@ -61,6 +61,9 @@ public class BackendSession {
     private static PreparedStatement SELECT_FROM_HOTELS;
     private static PreparedStatement INSERT_INTO_HOTELS;
 
+	private static PreparedStatement DELETE_ALL_FREE_ROOMS;
+	private static PreparedStatement DELETE_ALL_HOTELS;
+	private static PreparedStatement DELETE_ALL_OCCUPIED_ROOMS;
 
 	private void prepareStatements() throws BackendException {
 		try {
@@ -84,6 +87,13 @@ public class BackendSession {
                 "SELECT * FROM Hotels;");
 			INSERT_INTO_HOTELS = session.prepare(
 				"INSERT INTO Hotels (id, name) VALUES (?, ?)");
+			DELETE_ALL_FREE_ROOMS = session.prepare(
+				"DELETE FROM FreeRooms;");
+			DELETE_ALL_HOTELS = session.prepare(
+				"DELETE FROM Hotels;");
+			DELETE_ALL_OCCUPIED_ROOMS = session.prepare(
+				"DELETE FROM OccupiedRooms;");
+			
 		} catch (Exception e) {
 			throw new BackendException("Could not prepare statements. " + e.getMessage() + ".", e);
 		}
@@ -237,6 +247,22 @@ public class BackendSession {
 			}
 		}
 	}
+	
+	public List<Integer> getOccupiedRooms(int hotelId, String user) {
+		BoundStatement bs = new BoundStatement(SELECT_FROM_OCCUPIED_ROOMS_BY_CUSTOMER);
+		bs.bind(hotelId, user);
+		ResultSet rs = null;
+        List<Integer> result = new ArrayList<Integer>();
+        try {
+            rs = session.execute(bs);
+        } catch(Exception e) {
+            throw new BackendException("Could not perform a query. " + e.getMessage() + ".", e);
+        }
+        for (Row row : rs){
+            result.add(row.getInt("room"));
+        }
+        return result;
+	}
 
 	public List<Integer> getAllHotels() throws BackendException {
         BoundStatement bs = new BoundStatement(SELECT_FROM_HOTELS);
@@ -252,6 +278,27 @@ public class BackendSession {
         }
         return result;
     }
+    
+    public void deleteAll() {
+		BoundStatement bs = new BoundStatement(DELETE_ALL_FREE_ROOMS);
+		try {
+            rs = session.execute(bs);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+		bs = new BoundStatement(DELETE_ALL_HOTELS);
+		try {
+            rs = session.execute(bs);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+		bs = new BoundStatement(DELETE_ALL_OCCUPIED_ROOMS);
+		try {
+            rs = session.execute(bs);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+	}
 
 	protected void finalize() {
 		try {

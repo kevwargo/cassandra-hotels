@@ -62,24 +62,23 @@ public class CmdLine {
         System.out.printf("Hotel %s with %d free rooms added.", command[1], Integer.parseInt(command[2]));
     }
     
-    public static void runCustomer() {
+    public static void runCustomer() throws BackendException {
         String name = UUID.randomUUID().toString();
         int booked = 0;
         for(int i = 0; i < 3; i++) {
-            try {
-				int roomCount = new Random().nextInt(6) + 1;
-                if (backendSession.bookRooms(stressedHotelID, name, roomCount)) {
-					booked += roomCount;
-                    System.out.printf("Customer %s booked %d rooms.\n", name, roomCount);
-                } else {
-                    System.out.printf("Customer %s failed to book %d rooms.\n", name, roomCount);
-                }
-            } catch (BackendException e) {
-                e.printStackTrace();
+			int roomCount = new Random().nextInt(6) + 1;
+            if (backendSession.bookRooms(stressedHotelID, name, roomCount)) {
+				booked += roomCount;
+                System.out.printf("Customer %s booked %d rooms.\n", name, roomCount);
+            } else {
+                System.out.printf("Customer %s failed to book %d rooms.\n", name, roomCount);
             }
         }
-
-        
+		List<Integer> occupiedRooms = backendSession.getOccupiedRooms(stressedHotelID, name);
+        if (occupiedRooms.size() < booked) {
+			System.out.printf("Customer %s booked %d, but occupied %d.\n", name, booked, occupiedRooms.size());
+		}
+		backendSession.unBookRooms(stressedHotelID, name);
     }
 
     private static void createStressedHotel() throws BackendException {
@@ -94,7 +93,11 @@ public class CmdLine {
             for(int i = 0; i < 500; i++) {
                 Thread t = new Thread() {
                     public void run() {
-                        runCustomer();
+						try {
+							runCustomer();
+						catch (BackendException be) {
+							be.printStackTrace();
+						}
                     }
                 };
                 threads.add(t);
@@ -107,7 +110,9 @@ public class CmdLine {
 			}
         } catch (BackendException e) {
             e.printStackTrace();
-        }
+        } finally {
+			backendSession.deleteAll();
+		}
 
     }
 }
