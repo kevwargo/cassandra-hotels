@@ -1,0 +1,24 @@
+CREATE KEYSPACE IF NOT EXISTS Hotels
+  WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };
+
+USE Hotels;
+
+CREATE TABLE FreeRooms (
+	hotelId int,
+	room int,
+	PRIMARY KEY (hotelId, room)
+);
+
+CREATE TABLE OccupiedRooms (
+	hotelId int,
+	room int,
+	customer varchar,
+	PRIMARY KEY (hotelId, room, customer)
+);
+
+CREATE TABLE Hotels (
+	id int,
+	name varchar,
+	PRIMARY KEY(id)
+);
+

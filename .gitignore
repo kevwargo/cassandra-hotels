@@ -1,0 +1,9 @@
+bin/
+.gradle/
+*.log
+*.class
+
+# Temp files
+*~
+\#*
+.\#*
