@@ -13,23 +13,27 @@ public class CmdLine {
         boolean run = true;
         while(run) {
             String cmd = scanner.nextLine();
-            switch (cmd) {
-                case "book":
-                    book(scanner);
-                    break;
-                case "unbook":
-                    unbook(scanner);
-                    break;
-                case "stress":
-					stressTest();
-					break;
-				case "addHotel":
-					addHotel(scanner);
-					break;
-                default:
-                    System.out.println("Command was not recognized.");
-                    break;
-            }
+			try{
+				switch (cmd) {
+					case "book":
+						book(scanner);
+						break;
+					case "unbook":
+						unbook(scanner);
+						break;
+					case "stress":
+						stressTest();
+						break;
+					case "addHotel":
+						addHotel(scanner);
+						break;
+					default:
+						System.out.println("Command was not recognized.");
+						break;
+				}
+			} catch (ArrayIndexOutOfBoundsException ae) {
+				System.out.println("Invalid input");
+			}
         }
     }
 
@@ -95,7 +99,7 @@ public class CmdLine {
                     public void run() {
 						try {
 							runCustomer();
-						catch (BackendException be) {
+						} catch (BackendException be) {
 							be.printStackTrace();
 						}
                     }

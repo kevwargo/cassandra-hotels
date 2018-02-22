@@ -11,9 +11,9 @@ CREATE TABLE FreeRooms (
 
 CREATE TABLE OccupiedRooms (
 	hotelId int,
-	room int,
 	customer varchar,
-	PRIMARY KEY (hotelId, room, customer)
+	room int,
+	PRIMARY KEY (hotelId, customer, room)
 );
 
 CREATE TABLE Hotels (

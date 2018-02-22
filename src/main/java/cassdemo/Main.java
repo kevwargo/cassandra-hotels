@@ -29,7 +29,6 @@ public class Main {
 		CmdLine.backendSession = new BackendSession(contactPoint, keyspace);
 
 
-        CmdLine.stressTest();
         CmdLine.run();
 
 		System.exit(0);

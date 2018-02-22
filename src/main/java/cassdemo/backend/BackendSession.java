@@ -81,18 +81,18 @@ public class BackendSession {
 			INSERT_INTO_OCCUPIED_ROOMS = session.prepare(
 					"INSERT INTO OccupiedRooms (hotelId, room, customer) VALUES (?, ?, ?);");
 			DELETE_FROM_OCCUPIED_ROOMS = session.prepare(
-					"DELETE FROM OccupiedRooms WHERE hotelId = ? AND room = ?;");
+					"DELETE FROM OccupiedRooms WHERE hotelId = ? AND customer = ? AND room = ?;");
 
             SELECT_FROM_HOTELS = session.prepare(
                 "SELECT * FROM Hotels;");
 			INSERT_INTO_HOTELS = session.prepare(
 				"INSERT INTO Hotels (id, name) VALUES (?, ?)");
 			DELETE_ALL_FREE_ROOMS = session.prepare(
-				"DELETE FROM FreeRooms;");
+				"TRUNCATE FreeRooms;");
 			DELETE_ALL_HOTELS = session.prepare(
-				"DELETE FROM Hotels;");
+				"TRUNCATE Hotels;");
 			DELETE_ALL_OCCUPIED_ROOMS = session.prepare(
-				"DELETE FROM OccupiedRooms;");
+				"TRUNCATE OccupiedRooms;");
 			
 		} catch (Exception e) {
 			throw new BackendException("Could not prepare statements. " + e.getMessage() + ".", e);
@@ -210,7 +210,7 @@ public class BackendSession {
 
 		for (Integer rRoom : rooms) {
 			bs = new BoundStatement(DELETE_FROM_OCCUPIED_ROOMS);
-			bs.bind(hotelId, rRoom);
+			bs.bind(hotelId, customer, rRoom);
 			try {
 				session.execute(bs);
 			} catch (Exception e) {
@@ -248,7 +248,7 @@ public class BackendSession {
 		}
 	}
 	
-	public List<Integer> getOccupiedRooms(int hotelId, String user) {
+	public List<Integer> getOccupiedRooms(int hotelId, String user) throws BackendException {
 		BoundStatement bs = new BoundStatement(SELECT_FROM_OCCUPIED_ROOMS_BY_CUSTOMER);
 		bs.bind(hotelId, user);
 		ResultSet rs = null;
@@ -281,6 +281,7 @@ public class BackendSession {
     
     public void deleteAll() {
 		BoundStatement bs = new BoundStatement(DELETE_ALL_FREE_ROOMS);
+		ResultSet rs = null;
 		try {
             rs = session.execute(bs);
         } catch(Exception e) {
