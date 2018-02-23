@@ -16,13 +16,6 @@ CREATE TABLE OccupiedRooms (
 	PRIMARY KEY (hotelId, customer, room)
 );
 
-CREATE TABLE Reservations (
-	hotelId int,
-	room int,
-	customer varchar,
-	PRIMARY KEY (hotelId, room, customer)
-);
-
 CREATE TABLE Hotels (
 	id int,
 	name varchar,

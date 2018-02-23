@@ -16,16 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/*
- * For error handling done right see: 
- * https://www.datastax.com/dev/blog/cassandra-error-handling-done-right
- * 
- * Performing stress tests often results in numerous WriteTimeoutExceptions, 
- * ReadTimeoutExceptions (thrown by Cassandra replicas) and 
- * OpetationTimedOutExceptions (thrown by the client). Remember to retry
- * failed operations until success (it can be done through the RetryPolicy mechanism:
- * https://stackoverflow.com/questions/30329956/cassandra-datastax-driver-retry-policy )
- */
 
 public class BackendSession {
 
